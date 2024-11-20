@@ -90,6 +90,7 @@ public class MetricFlush {
 
             if( accumulatedMetrics.containsKey( MetricAggregator.COUNT_PREFIX + key ) ) {   // This is not a COUNT type metric.
                 finalOutput.put("avg_" + key, ((accumulatedMetrics.get(key) / accumulatedMetrics.get(MetricAggregator.COUNT_PREFIX + key)) * 100 ) / 100);
+                finalOutput.put("count_" + key, accumulatedMetrics.get(MetricAggregator.COUNT_PREFIX + key));
                 if( isMaxMetricRequired( key ) )
                     finalOutput.put("max_" + key, accumulatedMetrics.get(MetricAggregator.MAX_PREFIX + key));
             }
