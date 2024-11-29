@@ -1,6 +1,9 @@
 package com.neurospark.nerdnudge.metrics.metrics;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neurospark.nerdnudge.metrics.logging.NerdLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class MetricFlush {
     public static NerdLogger logger = new NerdLogger();
 
@@ -27,7 +31,7 @@ public class MetricFlush {
         FLUSH_FREQUENCY = flushFrequency;
     }
 
-    public void flushMetrics() {
+    public void flushMetrics() throws JsonProcessingException {
         logger.log( "info",  "{} Nerd Metrics: Flusher woke up !!!", new Date() );
 
         Map< String, Double > accumulatedMetrics = getAccumulatedMetricsAcrossThreads();
@@ -38,8 +42,10 @@ public class MetricFlush {
             return;
         }
 
-        logger.log("info", "Nerd Metrics: FINAL OUTPUT METRICS STATS: {}", finalOutput);
-        PROCESSING_STATS_REPORT_LOGGER.log(PROCESSING_STATS_REPORT, finalOutput);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String metricsJson = objectMapper.writeValueAsString(finalOutput);
+        logger.log("info", "Nerd Metrics: FINAL OUTPUT METRICS STATS: {}", metricsJson);
+        PROCESSING_STATS_REPORT_LOGGER.log(PROCESSING_STATS_REPORT, metricsJson);
     }
 
     private static boolean isMaxMetricRequired( String key ) {
